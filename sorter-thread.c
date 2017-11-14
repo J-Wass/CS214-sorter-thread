@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <pthread.h>
 #include <sys/types.h>
-#include <sys/wait.h>
-#include <sys/mman.h>
+#include "stack.h"
 #include "Sorter.h"
 #include "mergesort.c"
 
@@ -19,7 +19,7 @@
   fclose(file);
   return 0;
 }*/
-static int *processCount;
+static int *threadCount;
 
 int main(int argc, char ** argv){
   if(argc < 2){
@@ -114,32 +114,23 @@ int main(int argc, char ** argv){
        outDir);
       return 0;
   }
-  int ppid = getpid();
-  printf("Initial PID: %d\n", ppid);
-  printf("PIDS of all child processes: ");
+  pthread_id_np_t   tid;
+  tid = pthread_getthreadid_np();
+  printf("Initial TID: %d\n", tid);
+  printf("TIDs of all child thread: ");
   fflush(stdout);
-  processCount = mmap(NULL, sizeof(int), PROT_READ|PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
-  int initial_proc = fork();
-  if(initial_proc == 0){
-    sortCSVs(inputDir, inDir, outputDir, outDir, sortInt, sortByCol);
-  }
-  else{
-    int status;
-    waitpid(initial_proc, &status, 0);
-    printf("\nTotal number of processes: %d\n", *processCount + 1);
-  }
+  threadCount = (int *)malloc(sizeof(int));
+  sortCSVs(inputDir, inDir, outputDir, outDir, sortInt, sortByCol);
+  printf("\nTotal number of threads: %d\n", *threadCount + 1);
   closedir(inputDir);
   closedir(outputDir);
-  if(getpid() == ppid){
-    puts("");
-  }
   return 0;
 }
 
 void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir,  int sortByCol, char* sortName){
   struct dirent* inFile;
-  pid_t child_pid;
   char * isSorted;
+  SortedRecords = stack_create(256);
   while((inFile = readdir(inputDir)) != NULL){
     isSorted = strstr(inFile->d_name, "-sorted-");
     if((strcmp(inFile->d_name, ".") == 0 || strcmp(inFile->d_name, "..") == 0) && inFile->d_type == 4){
@@ -148,16 +139,8 @@ void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir,  int
     if(isSorted){ //contains -sorted- or is . or is ..
     	continue; //find next file
     }
-    child_pid = fork();
-    if(child_pid == 0){
-    	continue; //child gets next file, parent continues
-    }
-    *processCount = (*processCount)+1;
     char * name = inFile->d_name;
     int l = strlen(name);
-    int pid = getpid();
-    printf("%d, ", pid);
-    fflush(stdout);
     //REGULAR FILE
     if(inFile->d_type == 8 && name[l-4] == '.' && name[l-3] == 'c' && name[l-2] == 's' && name[l-1] == 'v'){
       char path[strlen(inDir) + 1 + strlen(name)];
@@ -165,7 +148,8 @@ void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir,  int
       strcat(path, "/");
       strcat(path, name);
       FILE * readFile = fopen(path, "r");
-      sortFile(sortByCol, outDir, readFile, name, sortName);
+      //RUN SORT FILE HERE AS A THREAD
+      push(SortedRecords,sortFile(sortByCol, outDir, readFile, name, sortName));
       fclose(readFile);
     }
     //DIRECTORY
@@ -175,25 +159,12 @@ void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir,  int
       strcat(newDir, "/");
       strcat(newDir, name);
       DIR * open = opendir(newDir);
-      //create fork, make child sort the following directory
-      int newPid = fork();
-      if(newPid == 0){
-        sortCSVs(open, newDir, outputDir, outDir, sortByCol, sortName);
-      }
-      //parent waits for child to iterate entire directory before continuing
-      if(newPid != 0){
-        int status;
-        waitpid(newPid, &status, 0);
-      }
     }
-    int status;
-    waitpid(child_pid, &status, 0);
-    exit(0);
   }
-  exit(0);
 }
 
-void sortFile(int sortByCol, char * outDirString, FILE * sortFile, char * filename, char * sortName){
+Record* sortFile(int sortByCol, char * outDirString, FILE * sortFile, char * filename, char * sortName){
+  //PRINT OUT OUR TID HERE
   char * line = NULL;
   size_t nbytes = 0 * sizeof(char);
   Record * prevRec = NULL;
@@ -203,7 +174,6 @@ void sortFile(int sortByCol, char * outDirString, FILE * sortFile, char * filena
   {
   		return;
   }//not correctly formatted
-
 
   //eat sortFile line by line
   while (getline(&line, &nbytes, sortFile) != -1) {
@@ -359,118 +329,6 @@ void sortFile(int sortByCol, char * outDirString, FILE * sortFile, char * filena
   //sort the linked list based off of sort column
   Record ** Shead = mergesort(&head, sortByCol);
   Record * sortedHead = *Shead;
-  int l = strlen(filename);
-  char newFile[(l-4) + 13 + strlen(outDirString) + strlen(sortName)];//13 is for -sorted- + .csv + new slash
-  strcpy(newFile, outDirString);
-  strcat(newFile, "/");
-  strncat(newFile,filename,l - 4);//l-4 to trim the .csv extension
-  strcat(newFile,"-sorted-");
-  strcat(newFile,sortName);
-  strcat(newFile,".csv");
-  //printf("%d: WRITING %s\n", getpid(), newFile);
-  FILE * writeFile = fopen(newFile, "w");
-
-  //print CSV header to file
-  fprintf(writeFile,"color,director_name,num_critic_for_reviews,duration,director_facebook_likes,"
-  "actor_3_facebook_likes,actor_2_name,actor_1_facebook_likes,gross,genres,actor_1_name,"
-  "movie_title,num_voted_users,cast_total_facebook_likes,actor_3_name,facenumber_in_poster,"
-  "plot_keywords,movie_imdb_link,num_user_for_reviews,language,country,content_rating,"
-  "budget,title_year,actor_2_facebook_likes,imdb_score,aspect_ratio,movie_facebook_likes\n");
-
-  while(sortedHead != NULL){
-    Record * r = sortedHead;
-    char numCritic[50] = "";
-    char duration[50] = "";
-    char directLikes[50] = "";
-    char actor3Likes[50] = "";
-    char actor1Likes[50] = "";
-    char gross[50] = "";
-    char numVoted[50] = "";
-    char castLikes[50] = "";
-    char faceNumber[50] = "";
-    char numReviews[50] = "";
-    char budget[50] = "";
-    char actor2Likes[50] = "";
-    char titleYear[50] = "";
-    char imdbScore[50] = "";
-    char aspectRatio[50] = "";
-    char movieLikes[50] = "";
-
-    if(r->num_critic_for_reviews != -1){
-        snprintf(numCritic, 5000, "%d",r->num_critic_for_reviews);
-    }
-    if(r->duration != -1){
-        snprintf(duration, 5000, "%d",r->duration);
-    }
-    if(r->director_facebook_likes != -1){
-        snprintf(directLikes, 5000, "%d",r->director_facebook_likes);
-    }
-    if(r->actor_3_facebook_likes != -1){
-        snprintf(actor3Likes, 5000, "%d",r->actor_3_facebook_likes);
-    }
-    if(r->actor_1_facebook_likes != -1){
-        snprintf(actor1Likes, 5000, "%d",r->actor_1_facebook_likes);
-    }
-    if(r->gross != -1){
-        snprintf(gross, 5000, "%d",r->gross);
-    }
-    if(r->num_voted_users != -1){
-        snprintf(numVoted, 5000, "%d",r->num_voted_users);
-    }
-    if(r->cast_total_facebook_likes != -1){
-        snprintf(castLikes, 5000, "%d",r->cast_total_facebook_likes);
-    }
-    if(r->facenumber_in_poster != -1){
-        snprintf(faceNumber, 5000, "%d",r->facenumber_in_poster);
-    }
-    if(r->num_critic_for_reviews != -1){
-        snprintf(numReviews, 5000, "%d",r->num_critic_for_reviews);
-    }
-    if(r->budget != -1){
-        snprintf(budget, 5000, "%li",r->budget);
-    }
-    if(r->actor_2_facebook_likes != -1){
-        snprintf(actor2Likes, 5000, "%d",r->actor_2_facebook_likes);
-    }
-    if(r->title_year != -1){
-        snprintf(titleYear, 5000, "%d",r->title_year);
-    }
-    if(r->imdb_score != -1){
-        snprintf(imdbScore, 5000, "%f",r->imdb_score);
-    }
-    if(r->aspect_ratio != -1){
-        snprintf(aspectRatio, 5000, "%f",r->aspect_ratio);
-    }
-    if(r->movie_facebook_likes != -1){
-        snprintf(movieLikes, 5000, "%d",r->movie_facebook_likes);
-    }
-
-    if(strchr(r->movie_title, ',') == NULL){ //no commas in this movie title
-      fprintf(writeFile,"%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n",
-            r->color, r->director_name, numCritic, duration,
-            directLikes, actor3Likes, r->actor_2_name,
-            actor1Likes, gross, r->genres, r->actor_1_name,
-            r->movie_title, numVoted, castLikes,
-            r->actor_3_name, faceNumber, r->plot_keywords, r->movie_imdb_link,
-            numReviews,r->language, r->country, r->content_rating,
-            budget, titleYear, actor2Likes, imdbScore,
-            aspectRatio, movieLikes);
-    }
-    else{ //put quotes around the movie title
-      fprintf(writeFile,"%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,\"%s\",%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n",
-              r->color, r->director_name, numCritic, duration,
-              directLikes, actor3Likes, r->actor_2_name,
-              actor1Likes, gross, r->genres, r->actor_1_name,
-              r->movie_title, numVoted, castLikes,
-              r->actor_3_name, faceNumber, r->plot_keywords, r->movie_imdb_link,
-              numReviews,r->language, r->country, r->content_rating,
-              budget, titleYear, actor2Likes, imdbScore,
-              aspectRatio, movieLikes);
-    }
-    Record * temp = sortedHead;
-    sortedHead = sortedHead->next;
-    free(temp);
-  }
   fclose(writeFile);
-  return;
+  return sortedHead;
 }

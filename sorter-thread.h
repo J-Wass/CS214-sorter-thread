@@ -1,5 +1,6 @@
-#ifndef SORTER_H
-#define SORTER_H
+#ifndef SORTER-THREAD_H
+#define SORTER-THREAD_H
+
 struct rStruct{
   char* color;
   char* director_name;
