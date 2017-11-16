@@ -1,6 +1,3 @@
-#include "Sorter.h"
-#include <string.h>
-
 int
 count(Record ** head)
 {//count how many things are in the list
@@ -14,7 +11,7 @@ count(Record ** head)
 	}
 	//printf("%d\n",c);
 	return c;
-	
+
 }
 
 Record *
@@ -36,7 +33,7 @@ split(Record ** head, int count)
 	Record * secondhead = (*temp)->next;
 	(**temp).next = NULL;
 	return secondhead;
-	
+
 }
 
 
@@ -62,7 +59,7 @@ merge(Record ** head, Record ** secondHead, int sortBycol)
       if(!((*secondHead)->next)){
       s2 = 1;
       }
-      
+
 	  switch(sortBycol)
   {
 		case 0: //char* color;

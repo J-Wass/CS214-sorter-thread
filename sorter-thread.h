@@ -1,5 +1,8 @@
-#ifndef SORTER-THREAD_H
-#define SORTER-THREAD_H
+#ifndef SORTER_THREAD_H
+#define SORTER_THREAD_H
+
+extern int * sortInt;
+extern int * threadCount;
 
 struct rStruct{
   char* color;
@@ -39,8 +42,8 @@ Record ** mergesort(Record **, int);
 int count(Record **);
 Record * split(Record **, int);
 Record ** merge(Record **, Record **, int);
-void sortFile(int sortByCol, char * outDirString, FILE * sortFile, char * filename, char* sortName);
-void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir, int sortByCol, char* sortName);
+void* FileSortHandler(void * filename);
+void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir, char* sortName, short mainCall);
 
 
 #endif

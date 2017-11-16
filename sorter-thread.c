@@ -7,21 +7,18 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <sys/types.h>
-#include "stack.h"
-#include "Sorter.h"
+#include "sorter-thread.h"
 #include "mergesort.c"
+#include "stack.h"
 
-//for testing a specific file
-/*int main(void){
-  FILE * file = fopen("movie_metadata.csv", "r");
-  char * filename = "sort_movies.csv";
-  sortFile(15, NULL, file, filename);
-  fclose(file);
-  return 0;
-}*/
-static int *threadCount;
+//RUN WITH VALGRIND PLS
+
+int * threadCount;
+int * sortInt;
 
 int main(int argc, char ** argv){
+  sortInt = (int *)malloc(sizeof(int));
+  threadCount = (int *)malloc(sizeof(int));
   if(argc < 2){
     fprintf(stderr, "Too few arguments. Usage is ./sorter -c [sortcol] -d [in directory] -o [out directory]");
     return 0;
@@ -30,42 +27,41 @@ int main(int argc, char ** argv){
     fprintf(stderr, "Expecting -c flag. Usage is './sorter -c [sortcol] -d [in directory] -o [out directory]'");
     return 0;
   }
+
   //parse sortbycol to an int for sorting
   char * sortByCol = argv[2];
-  int sortInt = 0;
-  if(strcmp(sortByCol,  "color")==0)sortInt=0;
-  else if(strcmp(sortByCol, "director_name")==0)sortInt=1;
-  else if(strcmp(sortByCol, "num_critic_for_reviews")==0)sortInt=2;
-  else if(strcmp(sortByCol, "duration")==0)sortInt=3;
-  else if(strcmp(sortByCol, "director_facebook_likes")==0)sortInt=4;
-  else if(strcmp(sortByCol, "actor_3_facebook_likes")==0)sortInt=5;
-  else if(strcmp(sortByCol, "actor_2_name")==0)sortInt=6;
-  else if(strcmp(sortByCol, "actor_1_facebook_likes")==0)sortInt=7;
-  else if(strcmp(sortByCol, "gross")==0)sortInt=8;
-  else if(strcmp(sortByCol, "genres")==0)sortInt=9;
-  else if(strcmp(sortByCol, "actor_1_name")==0)sortInt=10;
-  else if(strcmp(sortByCol, "movie_title")==0)sortInt=11;
-  else if(strcmp(sortByCol, "num_voted_users")==0)sortInt=12;
-  else if(strcmp(sortByCol, "cast_total_facebook_likes")==0)sortInt=13;
-  else if(strcmp(sortByCol, "actor_3_name")==0)sortInt=14;
-  else if(strcmp(sortByCol, "facenumber_in_poster")==0)sortInt=15;
-  else if(strcmp(sortByCol, "plot_keywords")==0)sortInt=16;
-  else if(strcmp(sortByCol, "movie_imdb_link")==0)sortInt=17;
-  else if(strcmp(sortByCol, "num_user_for_reviews")==0)sortInt=18;
-  else if(strcmp(sortByCol, "language")==0)sortInt=19;
-  else if(strcmp(sortByCol, "country")==0)sortInt=20;
-  else if(strcmp(sortByCol, "content_rating")==0)sortInt=21;
-  else if(strcmp(sortByCol, "budget")==0)sortInt=22;
-  else if(strcmp(sortByCol, "title_year")==0)sortInt=23;
-  else if(strcmp(sortByCol, "actor_2_facebook_likes")==0)sortInt=24;
-  else if(strcmp(sortByCol, "imdb_score")==0)sortInt=25;
-  else if(strcmp(sortByCol, "aspect_ratio")==0)sortInt=26;
-  else if(strcmp(sortByCol, "movie_facebook_likes")==0)sortInt=27;
+  if(strcmp(sortByCol,  "color")==0) *sortInt=0;
+  else if(strcmp(sortByCol, "director_name")==0) *sortInt=1;
+  else if(strcmp(sortByCol, "num_critic_for_reviews")==0) *sortInt=2;
+  else if(strcmp(sortByCol, "duration")==0) *sortInt=3;
+  else if(strcmp(sortByCol, "director_facebook_likes")==0) *sortInt=4;
+  else if(strcmp(sortByCol, "actor_3_facebook_likes")==0) *sortInt=5;
+  else if(strcmp(sortByCol, "actor_2_name")==0) *sortInt=6;
+  else if(strcmp(sortByCol, "actor_1_facebook_likes")==0) *sortInt=7;
+  else if(strcmp(sortByCol, "gross")==0) *sortInt=8;
+  else if(strcmp(sortByCol, "genres")==0) *sortInt=9;
+  else if(strcmp(sortByCol, "actor_1_name")==0) *sortInt=10;
+  else if(strcmp(sortByCol, "movie_title")==0) *sortInt=11;
+  else if(strcmp(sortByCol, "num_voted_users")==0) *sortInt=12;
+  else if(strcmp(sortByCol, "cast_total_facebook_likes")==0) *sortInt=13;
+  else if(strcmp(sortByCol, "actor_3_name")==0) *sortInt=14;
+  else if(strcmp(sortByCol, "facenumber_in_poster")==0) *sortInt=15;
+  else if(strcmp(sortByCol, "plot_keywords")==0) *sortInt=16;
+  else if(strcmp(sortByCol, "movie_imdb_link")==0) *sortInt=17;
+  else if(strcmp(sortByCol, "num_user_for_reviews")==0) *sortInt=18;
+  else if(strcmp(sortByCol, "language")==0) *sortInt=19;
+  else if(strcmp(sortByCol, "country")==0) *sortInt=20;
+  else if(strcmp(sortByCol, "content_rating")==0) *sortInt=21;
+  else if(strcmp(sortByCol, "budget")==0) *sortInt=22;
+  else if(strcmp(sortByCol, "title_year")==0) *sortInt=23;
+  else if(strcmp(sortByCol, "actor_2_facebook_likes")==0) *sortInt=24;
+  else if(strcmp(sortByCol, "imdb_score")==0) *sortInt=25;
+  else if(strcmp(sortByCol, "aspect_ratio")==0) *sortInt=26;
+  else if(strcmp(sortByCol, "movie_facebook_likes")==0) *sortInt=27;
   else{
     fprintf(stderr, "Please use a valid column name!\n");
     return 0;
   }
-
   //load input and output directory to current working directory
   char inDir[1024];
   char outDir[1024];
@@ -114,23 +110,21 @@ int main(int argc, char ** argv){
        outDir);
       return 0;
   }
-  pthread_id_np_t   tid;
-  tid = pthread_getthreadid_np();
-  printf("Initial TID: %d\n", tid);
+  printf("Initial TID: %ld\n", (unsigned long int)pthread_self());
   printf("TIDs of all child thread: ");
   fflush(stdout);
-  threadCount = (int *)malloc(sizeof(int));
-  sortCSVs(inputDir, inDir, outputDir, outDir, sortInt, sortByCol);
+  *threadCount = -1;
+  sortCSVs(inputDir, inDir, outputDir, outDir, sortByCol, 1);
   printf("\nTotal number of threads: %d\n", *threadCount + 1);
   closedir(inputDir);
   closedir(outputDir);
   return 0;
 }
 
-void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir,  int sortByCol, char* sortName){
+void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir, char* sortName, short mainCall){
   struct dirent* inFile;
   char * isSorted;
-  SortedRecords = stack_create(256);
+  pthread_t * threads = (pthread_t *)malloc(sizeof(pthread_t) * 256);
   while((inFile = readdir(inputDir)) != NULL){
     isSorted = strstr(inFile->d_name, "-sorted-");
     if((strcmp(inFile->d_name, ".") == 0 || strcmp(inFile->d_name, "..") == 0) && inFile->d_type == 4){
@@ -143,14 +137,16 @@ void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir,  int
     int l = strlen(name);
     //REGULAR FILE
     if(inFile->d_type == 8 && name[l-4] == '.' && name[l-3] == 'c' && name[l-2] == 's' && name[l-1] == 'v'){
-      char path[strlen(inDir) + 1 + strlen(name)];
+      char * path = (char *)malloc(sizeof(char)*(strlen(inDir) + 2 + strlen(name)));
       strcpy(path, inDir);
       strcat(path, "/");
       strcat(path, name);
-      FILE * readFile = fopen(path, "r");
-      //RUN SORT FILE HERE AS A THREAD
-      push(SortedRecords,sortFile(sortByCol, outDir, readFile, name, sortName));
-      fclose(readFile);
+      strcat(path, "\0");
+      pthread_t thr;
+      pthread_create (&thr, NULL, FileSortHandler, (void *)path);
+      ++(*threadCount);
+      threads[*threadCount] = thr;
+      //break;//REMOVE AFTER TESTING
     }
     //DIRECTORY
     if(inFile->d_type == 4){
@@ -159,22 +155,30 @@ void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir,  int
       strcat(newDir, "/");
       strcat(newDir, name);
       DIR * open = opendir(newDir);
+      sortCSVs(open, newDir, outputDir, outDir, sortName, 0);
+      closedir(open);
+    }
+  }
+  //only run if called from main()
+  if(mainCall == 1){
+    int counter = *threadCount;
+    while(counter >= 0){
+      Record * head;
+      pthread_join(threads[counter], (void *)&head);
+      //combine all of the heads into a big linked list and sort
     }
   }
 }
 
-Record* sortFile(int sortByCol, char * outDirString, FILE * sortFile, char * filename, char * sortName){
-  //PRINT OUT OUR TID HERE
+void* FileSortHandler(void * filename){
+  printf("%ld, ",(unsigned long int)pthread_self());
+  fflush(stdout);
+  FILE * sortFile = fopen((char *)filename, "r");
   char * line = NULL;
   size_t nbytes = 0 * sizeof(char);
   Record * prevRec = NULL;
   Record * head = NULL;
   getline(&line, &nbytes, sortFile); //skip over first row (just the table headers)
-  if(strstr(line,"color,director_name,num_critic_for_reviews,duration,director_facebook_likes,actor_3_facebook_likes,actor_2_name,actor_1_facebook_likes,gross,genres,actor_1_name,movie_title,num_voted_users,cast_total_facebook_likes,actor_3_name,facenumber_in_poster,plot_keywords,movie_imdb_link,num_user_for_reviews,language,country,content_rating,budget,title_year,actor_2_facebook_likes,imdb_score,aspect_ratio,movie_facebook_likes") == NULL)
-  {
-  		return;
-  }//not correctly formatted
-
   //eat sortFile line by line
   while (getline(&line, &nbytes, sortFile) != -1) {
     head = (Record *)malloc(sizeof(Record));
@@ -325,10 +329,8 @@ Record* sortFile(int sortByCol, char * outDirString, FILE * sortFile, char * fil
     head->next = prevRec;
     prevRec = head;
   }
-
-  //sort the linked list based off of sort column
-  Record ** Shead = mergesort(&head, sortByCol);
-  Record * sortedHead = *Shead;
-  fclose(writeFile);
-  return sortedHead;
+  fclose(sortFile);
+  free(filename);
+  pthread_exit(head);
+  return NULL;
 }
