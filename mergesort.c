@@ -484,11 +484,36 @@ merge(Record ** head, Record ** secondHead, int sortBycol)
   }
 }
 
+void* 
+threadSort(void * in){//mergesort called by a single void * pointer, a helper function
+	mergeMeta *inp = (mergeMeta*)in;
+	Record ** sortedHead = malloc(sizeof(Record*));
+	*sortedHead = *mergesort(inp->head,inp->sortByCol);
+	return (void*) sortedHead;
+}
+
 
 Record **
 mergesort(Record ** head, int sortByCol)
  {//mergesort on head done by which column. COlumn is currently a string but we may swithc it to a int.
 	 int size = count(head);
+	 if(size > 2000){//the general case of a list with more than 2 items
+	 		Record *secondHead = malloc(sizeof(Record)); Record *fhead = malloc(sizeof(Record));
+	 		Record  **secondHEAD=malloc(sizeof(Record*)); Record **firstHEAD=malloc(sizeof(Record*));
+			secondHead = split(head,size);
+			mergeMeta secondHalf, firstHalf;
+			secondHalf.head = &secondHead;
+			secondHalf.sortByCol = sortByCol;
+			firstHalf.head = head;
+			firstHalf.sortByCol = sortByCol;
+			pthread_t t1,t2;
+			int status1,status2;
+			status1 = pthread_create(&t1,NULL,threadSort,&secondHalf);
+			status2 = pthread_create(&t2,NULL,threadSort,&firstHalf);
+			pthread_join(t1,(void**) &secondHEAD);
+			pthread_join(t2,(void**) &firstHEAD);
+			return merge(secondHEAD,firstHEAD,sortByCol);
+		}
 	 if(size > 2){//the general case of a list with more than 2 items
 		Record * secondHead; Record * fhead;
 		secondHead = split(head,size);
