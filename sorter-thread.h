@@ -43,7 +43,7 @@ int count(Record **);
 Record * split(Record **, int);
 Record ** merge(Record **, Record **, int);
 void* FileSortHandler(void * filename);
-void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir, char* sortName, short mainCall);
+void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir, char* sortName, short mainCall, int sortInt);
 
 
 #endif

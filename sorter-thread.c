@@ -30,34 +30,35 @@ int main(int argc, char ** argv){
 
   //parse sortbycol to an int for sorting
   char * sortByCol = argv[2];
-  if(strcmp(sortByCol,  "color")==0) *sortInt=0;
-  else if(strcmp(sortByCol, "director_name")==0) *sortInt=1;
-  else if(strcmp(sortByCol, "num_critic_for_reviews")==0) *sortInt=2;
-  else if(strcmp(sortByCol, "duration")==0) *sortInt=3;
-  else if(strcmp(sortByCol, "director_facebook_likes")==0) *sortInt=4;
-  else if(strcmp(sortByCol, "actor_3_facebook_likes")==0) *sortInt=5;
-  else if(strcmp(sortByCol, "actor_2_name")==0) *sortInt=6;
-  else if(strcmp(sortByCol, "actor_1_facebook_likes")==0) *sortInt=7;
-  else if(strcmp(sortByCol, "gross")==0) *sortInt=8;
-  else if(strcmp(sortByCol, "genres")==0) *sortInt=9;
-  else if(strcmp(sortByCol, "actor_1_name")==0) *sortInt=10;
-  else if(strcmp(sortByCol, "movie_title")==0) *sortInt=11;
-  else if(strcmp(sortByCol, "num_voted_users")==0) *sortInt=12;
-  else if(strcmp(sortByCol, "cast_total_facebook_likes")==0) *sortInt=13;
-  else if(strcmp(sortByCol, "actor_3_name")==0) *sortInt=14;
-  else if(strcmp(sortByCol, "facenumber_in_poster")==0) *sortInt=15;
-  else if(strcmp(sortByCol, "plot_keywords")==0) *sortInt=16;
-  else if(strcmp(sortByCol, "movie_imdb_link")==0) *sortInt=17;
-  else if(strcmp(sortByCol, "num_user_for_reviews")==0) *sortInt=18;
-  else if(strcmp(sortByCol, "language")==0) *sortInt=19;
-  else if(strcmp(sortByCol, "country")==0) *sortInt=20;
-  else if(strcmp(sortByCol, "content_rating")==0) *sortInt=21;
-  else if(strcmp(sortByCol, "budget")==0) *sortInt=22;
-  else if(strcmp(sortByCol, "title_year")==0) *sortInt=23;
-  else if(strcmp(sortByCol, "actor_2_facebook_likes")==0) *sortInt=24;
-  else if(strcmp(sortByCol, "imdb_score")==0) *sortInt=25;
-  else if(strcmp(sortByCol, "aspect_ratio")==0) *sortInt=26;
-  else if(strcmp(sortByCol, "movie_facebook_likes")==0) *sortInt=27;
+  int sortInt = 0;
+  if(strcmp(sortByCol,  "color")==0) sortInt=0;
+  else if(strcmp(sortByCol, "director_name")==0) sortInt=1;
+  else if(strcmp(sortByCol, "num_critic_for_reviews")==0) sortInt=2;
+  else if(strcmp(sortByCol, "duration")==0) sortInt=3;
+  else if(strcmp(sortByCol, "director_facebook_likes")==0) sortInt=4;
+  else if(strcmp(sortByCol, "actor_3_facebook_likes")==0) sortInt=5;
+  else if(strcmp(sortByCol, "actor_2_name")==0) sortInt=6;
+  else if(strcmp(sortByCol, "actor_1_facebook_likes")==0) sortInt=7;
+  else if(strcmp(sortByCol, "gross")==0) sortInt=8;
+  else if(strcmp(sortByCol, "genres")==0) sortInt=9;
+  else if(strcmp(sortByCol, "actor_1_name")==0) sortInt=10;
+  else if(strcmp(sortByCol, "movie_title")==0) sortInt=11;
+  else if(strcmp(sortByCol, "num_voted_users")==0) sortInt=12;
+  else if(strcmp(sortByCol, "cast_total_facebook_likes")==0) sortInt=13;
+  else if(strcmp(sortByCol, "actor_3_name")==0) sortInt=14;
+  else if(strcmp(sortByCol, "facenumber_in_poster")==0) sortInt=15;
+  else if(strcmp(sortByCol, "plot_keywords")==0) sortInt=16;
+  else if(strcmp(sortByCol, "movie_imdb_link")==0) sortInt=17;
+  else if(strcmp(sortByCol, "num_user_for_reviews")==0) sortInt=18;
+  else if(strcmp(sortByCol, "language")==0) sortInt=19;
+  else if(strcmp(sortByCol, "country")==0) sortInt=20;
+  else if(strcmp(sortByCol, "content_rating")==0) sortInt=21;
+  else if(strcmp(sortByCol, "budget")==0) sortInt=22;
+  else if(strcmp(sortByCol, "title_year")==0) sortInt=23;
+  else if(strcmp(sortByCol, "actor_2_facebook_likes")==0) sortInt=24;
+  else if(strcmp(sortByCol, "imdb_score")==0) sortInt=25;
+  else if(strcmp(sortByCol, "aspect_ratio")==0) sortInt=26;
+  else if(strcmp(sortByCol, "movie_facebook_likes")==0) sortInt=27;
   else{
     fprintf(stderr, "Please use a valid column name!\n");
     return 0;
@@ -114,14 +115,14 @@ int main(int argc, char ** argv){
   printf("TIDs of all child thread: ");
   fflush(stdout);
   *threadCount = -1;
-  sortCSVs(inputDir, inDir, outputDir, outDir, sortByCol, 1);
+  sortCSVs(inputDir, inDir, outputDir, outDir, sortByCol, 1, sortInt);
   printf("\nTotal number of threads: %d\n", *threadCount + 1);
   closedir(inputDir);
   closedir(outputDir);
   return 0;
 }
 
-void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir, char* sortName, short mainCall){
+void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir, char* sortName, short mainCall, int sortInt){
   struct dirent* inFile;
   char * isSorted;
   pthread_t * threads = (pthread_t *)malloc(sizeof(pthread_t) * 256);
@@ -155,17 +156,33 @@ void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir, char
       strcat(newDir, "/");
       strcat(newDir, name);
       DIR * open = opendir(newDir);
-      sortCSVs(open, newDir, outputDir, outDir, sortName, 0);
+      sortCSVs(open, newDir, outputDir, outDir, sortName, 0, sortInt);
       closedir(open);
     }
   }
   //only run if called from main()
   if(mainCall == 1){
     int counter = *threadCount;
+    Record * linkedlist = NULL;
     while(counter >= 0){
       Record * head;
-      pthread_join(threads[counter], (void *)&head);
-      //combine all of the heads into a big linked list and sort
+      pthread_join(threads[counter--], (void *)&head);
+      if(linkedlist == NULL){
+        linkedlist = head;
+      }
+      else{
+        Record * temp = linkedlist->next;
+        linkedlist->next = head->next;
+        head->next = temp;
+      }
+    }
+    Record * tempH = linkedlist;
+    linkedlist = linkedlist->next;
+    tempH->next = NULL;
+    Record * sortedList = *mergesort(&linkedlist, sortInt);
+    while(sortedList != NULL){
+      printf("%s\n", sortedList->movie_title);
+      sortedList = sortedList->next;
     }
   }
 }
@@ -178,6 +195,7 @@ void* FileSortHandler(void * filename){
   size_t nbytes = 0 * sizeof(char);
   Record * prevRec = NULL;
   Record * head = NULL;
+  Record * last;
   getline(&line, &nbytes, sortFile); //skip over first row (just the table headers)
   //eat sortFile line by line
   while (getline(&line, &nbytes, sortFile) != -1) {
@@ -326,9 +344,13 @@ void* FileSortHandler(void * filename){
     head->movie_facebook_likes = token[0] == '\0' ? -1 : atoi(token);
 
     //create a new struct
+    if(prevRec == NULL){
+      last = head;
+    }
     head->next = prevRec;
     prevRec = head;
   }
+  last->next = head; //complete circular linked list
   fclose(sortFile);
   free(filename);
   pthread_exit(head);
