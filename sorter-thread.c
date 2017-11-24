@@ -14,10 +14,9 @@
 //RUN WITH VALGRIND PLS
 
 int * threadCount;
-int * sortInt;
 
 int main(int argc, char ** argv){
-  sortInt = (int *)malloc(sizeof(int));
+  //sortInt = (int *)malloc(sizeof(int));
   threadCount = (int *)malloc(sizeof(int));
   if(argc < 2){
     fprintf(stderr, "Too few arguments. Usage is ./sorter -c [sortcol] -d [in directory] -o [out directory]");
@@ -115,17 +114,19 @@ int main(int argc, char ** argv){
   printf("TIDs of all child thread: ");
   fflush(stdout);
   *threadCount = -1;
-  sortCSVs(inputDir, inDir, outputDir, outDir, sortByCol, 1, sortInt);
+  pthread_t * threads = (pthread_t *)malloc(sizeof(pthread_t) * 256);
+  sortCSVs(inputDir, inDir, outputDir, outDir, sortByCol, 1, sortInt, threads);
   printf("\nTotal number of threads: %d\n", *threadCount + 1);
   closedir(inputDir);
   closedir(outputDir);
+  free(threads);
+  free(threadCount);
   return 0;
 }
 
-void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir, char* sortName, short mainCall, int sortInt){
+void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir, char* sortName, short mainCall, int sortInt, pthread_t * threads){
   struct dirent* inFile;
   char * isSorted;
-  pthread_t * threads = (pthread_t *)malloc(sizeof(pthread_t) * 256);
   while((inFile = readdir(inputDir)) != NULL){
     isSorted = strstr(inFile->d_name, "-sorted-");
     if((strcmp(inFile->d_name, ".") == 0 || strcmp(inFile->d_name, "..") == 0) && inFile->d_type == 4){
@@ -156,7 +157,7 @@ void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir, char
       strcat(newDir, "/");
       strcat(newDir, name);
       DIR * open = opendir(newDir);
-      sortCSVs(open, newDir, outputDir, outDir, sortName, 0, sortInt);
+      sortCSVs(open, newDir, outputDir, outDir, sortName, 0, sortInt, threads);
       closedir(open);
     }
   }
@@ -171,6 +172,7 @@ void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir, char
         linkedlist = head;
       }
       else{
+        //combining linked lists (doesn't fully work yet)
         Record * temp = linkedlist->next;
         linkedlist->next = head->next;
         head->next = temp;
@@ -179,11 +181,126 @@ void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir, char
     Record * tempH = linkedlist;
     linkedlist = linkedlist->next;
     tempH->next = NULL;
-    Record * sortedList = *mergesort(&linkedlist, sortInt);
-    while(sortedList != NULL){
-      printf("%s\n", sortedList->movie_title);
-      sortedList = sortedList->next;
+    Record * sortedHead = *mergesort(&linkedlist, sortInt);
+    //print out sorted file
+    char newFile[21 + strlen(outDir) + strlen(sortName)];
+    strcpy(newFile, outDir);
+    strcat(newFile, "/AllFiles-sorted-");
+    strcat(newFile,sortName);
+    strcat(newFile,".csv");
+    FILE * writeFile = fopen(newFile, "w");
+    fprintf(writeFile,"color,director_name,num_critic_for_reviews,duration,director_facebook_likes,"
+    "actor_3_facebook_likes,actor_2_name,actor_1_facebook_likes,gross,genres,actor_1_name,"
+    "movie_title,num_voted_users,cast_total_facebook_likes,actor_3_name,facenumber_in_poster,"
+    "plot_keywords,movie_imdb_link,num_user_for_reviews,language,country,content_rating,"
+    "budget,title_year,actor_2_facebook_likes,imdb_score,aspect_ratio,movie_facebook_likes\n");
+    while(sortedHead != NULL){
+      Record * r = sortedHead;
+      char numCritic[50] = "";
+      char duration[50] = "";
+      char directLikes[50] = "";
+      char actor3Likes[50] = "";
+      char actor1Likes[50] = "";
+      char gross[50] = "";
+      char numVoted[50] = "";
+      char castLikes[50] = "";
+      char faceNumber[50] = "";
+      char numReviews[50] = "";
+      char budget[50] = "";
+      char actor2Likes[50] = "";
+      char titleYear[50] = "";
+      char imdbScore[50] = "";
+      char aspectRatio[50] = "";
+      char movieLikes[50] = "";
+
+      if(r->num_critic_for_reviews != -1){
+          snprintf(numCritic, 5000, "%d",r->num_critic_for_reviews);
+      }
+      if(r->duration != -1){
+          snprintf(duration, 5000, "%d",r->duration);
+      }
+      if(r->director_facebook_likes != -1){
+          snprintf(directLikes, 5000, "%d",r->director_facebook_likes);
+      }
+      if(r->actor_3_facebook_likes != -1){
+          snprintf(actor3Likes, 5000, "%d",r->actor_3_facebook_likes);
+      }
+      if(r->actor_1_facebook_likes != -1){
+          snprintf(actor1Likes, 5000, "%d",r->actor_1_facebook_likes);
+      }
+      if(r->gross != -1){
+          snprintf(gross, 5000, "%d",r->gross);
+      }
+      if(r->num_voted_users != -1){
+          snprintf(numVoted, 5000, "%d",r->num_voted_users);
+      }
+      if(r->cast_total_facebook_likes != -1){
+          snprintf(castLikes, 5000, "%d",r->cast_total_facebook_likes);
+      }
+      if(r->facenumber_in_poster != -1){
+          snprintf(faceNumber, 5000, "%d",r->facenumber_in_poster);
+      }
+      if(r->num_critic_for_reviews != -1){
+          snprintf(numReviews, 5000, "%d",r->num_critic_for_reviews);
+      }
+      if(r->budget != -1){
+          snprintf(budget, 5000, "%li",r->budget);
+      }
+      if(r->actor_2_facebook_likes != -1){
+          snprintf(actor2Likes, 5000, "%d",r->actor_2_facebook_likes);
+      }
+      if(r->title_year != -1){
+          snprintf(titleYear, 5000, "%d",r->title_year);
+      }
+      if(r->imdb_score != -1){
+          snprintf(imdbScore, 5000, "%f",r->imdb_score);
+      }
+      if(r->aspect_ratio != -1){
+          snprintf(aspectRatio, 5000, "%f",r->aspect_ratio);
+      }
+      if(r->movie_facebook_likes != -1){
+          snprintf(movieLikes, 5000, "%d",r->movie_facebook_likes);
+      }
+
+      if(strchr(r->movie_title, ',') == NULL){ //no commas in this movie title
+        fprintf(writeFile,"%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n",
+              r->color, r->director_name, numCritic, duration,
+              directLikes, actor3Likes, r->actor_2_name,
+              actor1Likes, gross, r->genres, r->actor_1_name,
+              r->movie_title, numVoted, castLikes,
+              r->actor_3_name, faceNumber, r->plot_keywords, r->movie_imdb_link,
+              numReviews,r->language, r->country, r->content_rating,
+              budget, titleYear, actor2Likes, imdbScore,
+              aspectRatio, movieLikes);
+      }
+      else{ //put quotes around the movie title
+        fprintf(writeFile,"%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,\"%s\",%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n",
+                r->color, r->director_name, numCritic, duration,
+                directLikes, actor3Likes, r->actor_2_name,
+                actor1Likes, gross, r->genres, r->actor_1_name,
+                r->movie_title, numVoted, castLikes,
+                r->actor_3_name, faceNumber, r->plot_keywords, r->movie_imdb_link,
+                numReviews,r->language, r->country, r->content_rating,
+                budget, titleYear, actor2Likes, imdbScore,
+                aspectRatio, movieLikes);
+      }
+      Record * temp = sortedHead;
+      sortedHead = sortedHead->next;
+      free(temp->content_rating);
+      free(temp->country);
+      free(temp->language);
+      free(temp->movie_imdb_link);
+      free(temp->plot_keywords);
+      free(temp->actor_3_name);
+      free(temp->movie_title);
+      free(temp->actor_1_name);
+      free(temp->genres);
+      free(temp->actor_2_name);
+      free(temp->director_name);
+      free(temp->color);
+      free(temp);
     }
+    fclose(writeFile);
   }
 }
 
@@ -245,24 +362,30 @@ void* FileSortHandler(void * filename){
               break;
             case 2:
               head->num_critic_for_reviews = token[0] == '\0' ? -1 : atoi(token);
+              free(token);
               break;
             case 3:
               head->duration = token[0] == '\0' ? -1 : atoi(token);
+              free(token);
               break;
             case 4:
               head->director_facebook_likes = token[0] == '\0' ? -1 : atoi(token);
+              free(token);
               break;
             case 5:
               head->actor_3_facebook_likes = token[0] == '\0' ? -1 : atoi(token);
+              free(token);
               break;
             case 6:
               head->actor_2_name = token;
               break;
             case 7:
               head->actor_1_facebook_likes = token[0] == '\0' ? -1 : atoi(token);
+              free(token);
               break;
             case 8:
               head->gross = token[0] == '\0' ? -1 : atoi(token);
+              free(token);
               break;
             case 9:
               head->genres = token;
@@ -275,15 +398,18 @@ void* FileSortHandler(void * filename){
               break;
             case 12:
               head->num_voted_users = token[0] == '\0' ? -1 : atoi(token);
+              free(token);
               break;
             case 13:
               head->cast_total_facebook_likes = token[0] == '\0' ? -1 : atoi(token);
+              free(token);
               break;
             case 14:
               head->actor_3_name = token;
               break;
             case 15:
               head->facenumber_in_poster = token[0] == '\0' ? -1 : atoi(token);
+              free(token);
               break;
             case 16:
               head->plot_keywords = token;
@@ -293,6 +419,7 @@ void* FileSortHandler(void * filename){
               break;
             case 18:
               head->num_user_for_reviews = token[0] == '\0' ? -1 : atoi(token);
+              free(token);
               break;
             case 19:
               head->language = token;
@@ -305,21 +432,28 @@ void* FileSortHandler(void * filename){
               break;
             case 22:
               head->budget = token[0] == '\0' ? -1 :atol(token);
+              free(token);
               break;
             case 23:
               head->title_year = token[0] == '\0' ? -1 : atoi(token);
+              free(token);
               break;
             case 24:
               head->actor_2_facebook_likes = token[0] == '\0' ? -1 : atoi(token);
+              free(token);
               break;
             case 25:
               head->imdb_score = token[0] == '\0' ? -1 : atof(token);
+              free(token);
               break;
             case 26:
               head->aspect_ratio = token[0] == '\0' ? -1 : atof(token);
+              free(token);
               break;
             case 27:
+              //this case never happens lol
               head->movie_facebook_likes = token[0] == '\0' ? -1 : atoi(token);
+              free(token);
               break;
             default:
               break;
@@ -332,7 +466,7 @@ void* FileSortHandler(void * filename){
       end++;
     }
     //add final column
-    char * token = (char *)malloc(sizeof(char) * (end-start));
+    char * token = (char *)malloc(sizeof(char) * (end-start+1));
     int tempEnd = end;
     while(isspace(line[tempEnd])){
       tempEnd--;
@@ -342,6 +476,7 @@ void* FileSortHandler(void * filename){
     }
     memcpy(token, line + start, tempEnd - start + 1);
     head->movie_facebook_likes = token[0] == '\0' ? -1 : atoi(token);
+    free(token);
 
     //create a new struct
     if(prevRec == NULL){
