@@ -38,7 +38,7 @@ struct rStruct{
 };
 typedef struct rStruct Record;
 
-Record ** mergesort(Record **, int);
+void * mergesort(void *);
 int count(Record **);
 Record * split(Record **, int);
 Record ** merge(Record **, Record **, int);

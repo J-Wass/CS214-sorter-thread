@@ -16,7 +16,7 @@
 int * threadCount;
 
 int main(int argc, char ** argv){
-  //sortInt = (int *)malloc(sizeof(int));
+  sortingInt = (int *)malloc(sizeof(int));
   threadCount = (int *)malloc(sizeof(int));
   if(argc < 2){
     fprintf(stderr, "Too few arguments. Usage is ./sorter -c [sortcol] -d [in directory] -o [out directory]");
@@ -121,6 +121,7 @@ int main(int argc, char ** argv){
   closedir(outputDir);
   free(threads);
   free(threadCount);
+  free(sortingInt);
   return 0;
 }
 
@@ -163,6 +164,7 @@ void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir, char
   }
   //only run if called from main()
   if(mainCall == 1){
+    printf("maincall\n");
     int counter = *threadCount;
     Record * linkedlist = NULL;
     while(counter >= 0){
@@ -181,7 +183,13 @@ void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir, char
     Record * tempH = linkedlist;
     linkedlist = linkedlist->next;
     tempH->next = NULL;
-    Record * sortedHead = *mergesort(&linkedlist, sortInt);
+    *sortingInt = sortInt;
+    Record * sortedHead;
+    pthread_t sorterThread;
+    printf("before\n");
+    pthread_create (&sorterThread, NULL, mergesort, (void *)&linkedlist);
+		pthread_join(sorterThread, (void *)&sortedHead);
+    printf("after\n");
     //print out sorted file
     char newFile[21 + strlen(outDir) + strlen(sortName)];
     strcpy(newFile, outDir);
