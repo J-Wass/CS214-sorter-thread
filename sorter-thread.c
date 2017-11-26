@@ -185,10 +185,13 @@ void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir, char
     tempH->next = NULL;
     *sortingInt = sortInt;
     Record * sortedHead;
-    pthread_t sorterThread;
+    Record ** sorted_head;
+    //pthread_t sorterThread;
     printf("before\n");
-    pthread_create (&sorterThread, NULL, mergesort, (void *)&linkedlist);
-		pthread_join(sorterThread, (void *)&sortedHead);
+    //pthread_create (&sorterThread, NULL, mergesort, (void *)&linkedlist);
+		//pthread_join(sorterThread, (void *)&sortedHead);
+    sorted_head = mergesort(&linkedlist);
+    sortedHead= *sorted_head;
     printf("after\n");
     //print out sorted file
     char newFile[21 + strlen(outDir) + strlen(sortName)];

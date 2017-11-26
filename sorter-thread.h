@@ -37,11 +37,11 @@ struct rStruct{
   struct rStruct * next;
 };
 typedef struct rStruct Record;
-
-void * mergesort(void *);
+void* t_mergesort(void*);
+Record ** mergesort(Record**);
 int count(Record **);
 Record * split(Record **, int);
-Record ** merge(Record **, Record **, int);
+Record ** merge(Record **, Record **,int);
 void* FileSortHandler(void * filename);
 void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir, char* sortName, short mainCall, int sortInt, pthread_t * threads);
 

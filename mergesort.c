@@ -1,5 +1,4 @@
 int * sortingInt;
-
 int
 count(Record ** head)
 {//count how many things are in the list
@@ -486,285 +485,305 @@ merge(Record ** head, Record ** secondHead, int sortBycol)
   }
 }
 
+void*
+t_mergesort(void* arg){//basically just calls mergesort from a void*
+  return (void*) mergesort((Record**)arg);
+}
 
-void *
-mergesort(void * headp)
+
+
+Record **
+mergesort(Record** head)
  {//mergesort on head done by which column. COlumn is currently a string but we may swithc it to a int.
-	 Record ** head = (Record **)(headp);
 	 int size = count(head);
 	 int sortByCol = *sortingInt;
-	 if(size > 2){//the general case of a list with more than 2 items
-		Record * secondHead;
-		secondHead = split(head,size);
-		Record ** secondHalf = &secondHead;
-		pthread_t firstT;
-		pthread_t secondT;
-		pthread_create (&firstT, NULL, mergesort, (void *)head);
-		pthread_create (&secondT, NULL, mergesort, (void *)secondHalf);
-		pthread_join(firstT, (void *)&head);
-		pthread_join(secondT, (void *)&secondHalf);
-		pthread_exit(*merge(head,secondHalf,sortByCol));
-		return NULL;
+  if(size>10000){
+    printf("%d\n",size);
+    Record *secondHead; Record *firstHead;
+    Record  **secondHEAD; Record **firstHEAD;
+    secondHead = split(head,size);
+    pthread_t t1,t2;
+    pthread_create(&t1,NULL,t_mergesort,&secondHead);
+    pthread_create(&t2,NULL,t_mergesort,head);
+    pthread_join(t1,(void**) &secondHEAD);
+    pthread_join(t2,(void**) &firstHEAD);
+    return merge(secondHEAD,firstHEAD,sortByCol);
+  }
 
-	}
-	if(size == 2){ //if list has two items check, maybe swap and than get out.
-		Record * temp;
-		switch(sortByCol){
-		  case 0: //char* color;
+
+
+
+  if(size > 2){
+    Record * secondHead; Record * fhead;
+    secondHead = split(head,size);
+    Record ** secondHalf = &secondHead;
+    secondHead = *mergesort(secondHalf); //create a new thread here
+    fhead = *mergesort(head);
+    *head = fhead;
+    *secondHalf  = secondHead;
+    return merge(head,secondHalf,sortByCol);
+  }
+  if((*head) -> next == NULL){//only 1 element
+    return head;
+  }
+  Record * temp;
+  switch(sortByCol){
+    case 0: //char* color;
         if(strcmp((*head)->color,((*head)->next)-> color)<=0){
-         pthread_exit(head);return NULL;;
+         return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 1: //char* director_name;
+        return head;
+      case 1: //char* director_name;
         if(strcmp((*head)->director_name,((*head)->next)-> director_name)<=0){
-          pthread_exit(head);return NULL;;
+          return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 2: //int num_critic_for_reviews;
-  		  if(((*head)->num_critic_for_reviews) <= (((*head)->next)-> num_critic_for_reviews)){
-  			           pthread_exit(head);return NULL;;
-  		  }
-  		  temp = (*head)->next;
-  		  temp->next = *head;
-  		  (*head)->next = NULL;
-  		  *head = temp;
-  		  pthread_exit(head);return NULL;;
-  		case 3: //int duration;
+        return head;
+      case 2: //int num_critic_for_reviews;
+        if(((*head)->num_critic_for_reviews) <= (((*head)->next)-> num_critic_for_reviews)){
+                   return head;
+        }
+        temp = (*head)->next;
+        temp->next = *head;
+        (*head)->next = NULL;
+        *head = temp;
+        return head;
+      case 3: //int duration;
         if(((*head)->duration) <= (((*head)->next)-> duration)){
-        pthread_exit(head);return NULL;;
+        return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 4: //int director_facebook_likes;
+        return head;
+      case 4: //int director_facebook_likes;
         if(((*head)->director_facebook_likes) <= (((*head)->next)->director_facebook_likes)){
-        pthread_exit(head);return NULL;;
+        return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 5: //int actor_3_facebook_likes;
+        return head;
+      case 5: //int actor_3_facebook_likes;
         if(((*head)->actor_3_facebook_likes) <= (((*head)->next)-> actor_3_facebook_likes)){
-        pthread_exit(head);return NULL;;
+        return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 6: //char * actor_2_name;
+        return head;
+      case 6: //char * actor_2_name;
         if(strcmp((*head)->actor_2_name,((*head)->next)-> actor_2_name)<=0){
-         pthread_exit(head);return NULL;;
+         return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 7: //int actor_1_facebook_likes;
+        return head;
+      case 7: //int actor_1_facebook_likes;
         if(((*head)->actor_1_facebook_likes) <= (((*head)->next)->actor_1_facebook_likes)){
-        pthread_exit(head);return NULL;;
+        return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 8: //int gross;
+        return head;
+      case 8: //int gross;
         if(((*head)->gross) <= (((*head)->next)-> gross)){
-        pthread_exit(head);return NULL;;
+        return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 9: //char * genres;
+        return head;
+      case 9: //char * genres;
         if(strcmp((*head)->genres,((*head)->next)->genres)<=0){
-          pthread_exit(head);return NULL;;
+          return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 10: //char * actor_1_name;
+        return head;
+      case 10: //char * actor_1_name;
         if(strcmp(((*head)->actor_1_name),((*head)->next)-> actor_1_name)<=0){
-          pthread_exit(head);return NULL;;
+          return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 11: //char * movie_title;
+        return head;
+      case 11: //char * movie_title;
         if(strcmp((*head)->movie_title,((*head)->next)->movie_title)<=0){
-          pthread_exit(head);return NULL;;
+          return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 12: //int num_voted_users;
+        return head;
+      case 12: //int num_voted_users;
         if(((*head)->num_voted_users) <= (((*head)->next)-> num_voted_users)){
-        pthread_exit(head);return NULL;;
+        return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 13: //int cast_total_facebook_likes;
+        return head;
+      case 13: //int cast_total_facebook_likes;
         if(((*head)->cast_total_facebook_likes) <= (((*head)->next)-> cast_total_facebook_likes)){
-        pthread_exit(head);return NULL;;
+        return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 14: //char * actor_3_name;
+        return head;
+      case 14: //char * actor_3_name;
         if(strcmp((*head)->actor_3_name,((*head)->next)-> actor_3_name)<=0){
-          pthread_exit(head);return NULL;;
+          return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 15: //int facenumber_in_poster;
+        return head;
+      case 15: //int facenumber_in_poster;
         if(((*head)->facenumber_in_poster) <= (((*head)->next)-> facenumber_in_poster)){
-        pthread_exit(head);return NULL;;
+        return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 16: //char * plot_keywords;
+        return head;
+      case 16: //char * plot_keywords;
         if(strcmp((*head)->plot_keywords,((*head)->next)-> plot_keywords)<=0){
-          pthread_exit(head);return NULL;;
+          return head;
           }
           temp = (*head)->next;
           temp->next = *head;
           (*head)->next = NULL;
           *head = temp;
-          pthread_exit(head);return NULL;;
-  		case 17: //char * movie_imdb_link;
+          return head;
+      case 17: //char * movie_imdb_link;
         if(strcmp((*head)->movie_imdb_link,((*head)->next)-> movie_imdb_link)<=0){
-          pthread_exit(head);return NULL;;
+          return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 18: //int num_user_for_reviews;
+        return head;
+      case 18: //int num_user_for_reviews;
         if(((*head)->num_user_for_reviews) <= (((*head)->next)-> num_user_for_reviews)){
-        pthread_exit(head);return NULL;;
+        return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 19: //char * language;
+        return head;
+      case 19: //char * language;
         if(strcmp((*head)->language,((*head)->next)-> language)<=0){
-          pthread_exit(head);return NULL;;
+          return head;
           }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 20: //char * country;
+        return head;
+      case 20: //char * country;
         if(strcmp((*head)->country,((*head)->next)-> country)<=0){
-          pthread_exit(head);return NULL;;
+          return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 21: //char * content_rating;
+        return head;
+      case 21: //char * content_rating;
         if(strcmp((*head)->content_rating,((*head)->next)-> content_rating)<=0){
-          pthread_exit(head);return NULL;;
+          return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 22: //int budget;
+        return head;
+      case 22: //int budget;
         if(((*head)->budget) <= (((*head)->next)-> budget)){
-        pthread_exit(head);return NULL;;
+        return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 23: //int title_year;
+        return head;
+      case 23: //int title_year;
         if(((*head)->title_year) <= (((*head)->next)-> title_year)){
-        pthread_exit(head);return NULL;;
+        return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 24: //int actor_2_facebook_likes;
+        return head;
+      case 24: //int actor_2_facebook_likes;
         if(((*head)->actor_2_facebook_likes) <= (((*head)->next)-> actor_2_facebook_likes)){
-        pthread_exit(head);return NULL;;
+        return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 25: //float imdb_score;
+        return head;
+      case 25: //float imdb_score;
         if(((*head)->imdb_score) <= (((*head)->next)-> imdb_score)){
-          pthread_exit(head);return NULL;;
+          return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 26: //float aspect_ratio;
+        return head;
+      case 26: //float aspect_ratio;
         if(((*head)->aspect_ratio) <= (((*head)->next)-> aspect_ratio)){
-          pthread_exit(head);return NULL;;
+          return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-  		case 27: //int movie_facebook_likes;
+        return head;
+      case 27: //int movie_facebook_likes;
         if(((*head)->movie_facebook_likes) <= (((*head)->next)-> movie_facebook_likes)){
-          pthread_exit(head);return NULL;;
+          return head;
         }
         temp = (*head)->next;
         temp->next = *head;
         (*head)->next = NULL;
         *head = temp;
-        pthread_exit(head);return NULL;;
-	}
-	}
-		pthread_exit(head);return NULL;;
+        return head;
+  }
+    return head;
 
 
 }
+
+
