@@ -497,21 +497,6 @@ mergesort(Record** head)
  {//mergesort on head done by which column. COlumn is currently a string but we may swithc it to a int.
 	 int size = count(head);
 	 int sortByCol = *sortingInt;
-  if(size>10000){
-    printf("%d\n",size);
-    Record *secondHead; Record *firstHead;
-    Record  **secondHEAD; Record **firstHEAD;
-    secondHead = split(head,size);
-    pthread_t t1,t2;
-    pthread_create(&t1,NULL,t_mergesort,&secondHead);
-    pthread_create(&t2,NULL,t_mergesort,head);
-    pthread_join(t1,(void**) &secondHEAD);
-    pthread_join(t2,(void**) &firstHEAD);
-    return merge(secondHEAD,firstHEAD,sortByCol);
-  }
-
-
-
 
   if(size > 2){
     Record * secondHead; Record * fhead;
