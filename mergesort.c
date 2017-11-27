@@ -68,11 +68,311 @@ merge(Record ** head, Record** secondHead, int sortBycol)
         }*/
       case 1://char* director_name;
       case 2://int num_critic_for_reviews;
+        while(HEAD && sHEAD){
+          if((HEAD ->num_critic_for_reviews) <= (sHEAD->num_critic_for_reviews)){
+            if(count == 0){
+              ++count;
+              returnTop = HEAD;
+              returnHead = HEAD;
+            
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+           else{
+            returnTop->next = HEAD;
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop=returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+        }
+        else{
+          if(count == 0){
+            ++count;
+            returnTop = sHEAD;
+            returnHead = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop->next = NULL;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+          else{
+            returnTop ->next = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop = returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+        }
+      }
       case 3://int duration;
+       while(HEAD && sHEAD){
+          if((HEAD ->duration) <= (sHEAD->duration)){
+            if(count == 0){
+              ++count;
+              returnTop = HEAD;
+              returnHead = HEAD;
+            
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+           else{
+            returnTop->next = HEAD;
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop=returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+        }
+        else{
+          if(count == 0){
+            ++count;
+            returnTop = sHEAD;
+            returnHead = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop->next = NULL;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+          else{
+            returnTop ->next = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop = returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+        }
+      }
       case 4://int director_facebook_likes;
+        while(HEAD && sHEAD){
+          if((HEAD ->director_facebook_likes) <= (sHEAD->director_facebook_likes)){
+            if(count == 0){
+              ++count;
+              returnTop = HEAD;
+              returnHead = HEAD;
+            
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+           else{
+            returnTop->next = HEAD;
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop=returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+        }
+        else{
+          if(count == 0){
+            ++count;
+            returnTop = sHEAD;
+            returnHead = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop->next = NULL;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+          else{
+            returnTop ->next = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop = returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+        }
+      }
       case 5://int actor_3_facebook_likes;
+        while(HEAD && sHEAD){
+          if((HEAD ->actor_3_facebook_likes) <= (sHEAD->actor_3_facebook_likes)){
+            if(count == 0){
+              ++count;
+              returnTop = HEAD;
+              returnHead = HEAD;
+            
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+           else{
+            returnTop->next = HEAD;
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop=returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+        }
+        else{
+          if(count == 0){
+            ++count;
+            returnTop = sHEAD;
+            returnHead = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop->next = NULL;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+          else{
+            returnTop ->next = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop = returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+        }
+      }
       case 6://char * actor_2_name;
       case 7:// int actor_1_facebook_likes;
+        while(HEAD && sHEAD){
+          if((HEAD ->actor_1_facebook_likes) <= (sHEAD->actor_1_facebook_likes)){
+            if(count == 0){
+              ++count;
+              returnTop = HEAD;
+              returnHead = HEAD;
+            
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+           else{
+            returnTop->next = HEAD;
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop=returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+        }
+        else{
+          if(count == 0){
+            ++count;
+            returnTop = sHEAD;
+            returnHead = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop->next = NULL;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+          else{
+            returnTop ->next = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop = returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+        }
+      }
       case 8://int gross;
         while(HEAD && sHEAD){
           if((HEAD -> gross) <= (sHEAD->gross)){
@@ -138,21 +438,621 @@ merge(Record ** head, Record** secondHead, int sortBycol)
       case 10://char * actor_1_name;
       case 11://char * movie_title;
       case 12://int num_voted_users;
+        while(HEAD && sHEAD){
+          if((HEAD ->num_voted_users) <= (sHEAD->num_voted_users)){
+            if(count == 0){
+              ++count;
+              returnTop = HEAD;
+              returnHead = HEAD;
+            
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+           else{
+            returnTop->next = HEAD;
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop=returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+        }
+        else{
+          if(count == 0){
+            ++count;
+            returnTop = sHEAD;
+            returnHead = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop->next = NULL;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+          else{
+            returnTop ->next = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop = returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+        }
+      }
       case 13://int cast_total_facebook_likes;
+        while(HEAD && sHEAD){
+          if((HEAD ->cast_total_facebook_likes) <= (sHEAD->cast_total_facebook_likes)){
+            if(count == 0){
+              ++count;
+              returnTop = HEAD;
+              returnHead = HEAD;
+            
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+           else{
+            returnTop->next = HEAD;
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop=returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+        }
+        else{
+          if(count == 0){
+            ++count;
+            returnTop = sHEAD;
+            returnHead = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop->next = NULL;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+          else{
+            returnTop ->next = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop = returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+        }
+      }
       case 14://char * actor_3_name;
       case 15://int facenumber_in_poster;
+        while(HEAD && sHEAD){
+          if((HEAD ->facenumber_in_poster) <= (sHEAD->facenumber_in_poster)){
+            if(count == 0){
+              ++count;
+              returnTop = HEAD;
+              returnHead = HEAD;
+            
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+           else{
+            returnTop->next = HEAD;
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop=returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+        }
+        else{
+          if(count == 0){
+            ++count;
+            returnTop = sHEAD;
+            returnHead = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop->next = NULL;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+          else{
+            returnTop ->next = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop = returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+        }
+      }
       case 16://char * plot_keywords;
       case 17://char * movie_imdb_link;
       case 18://int num_user_for_reviews;
+        while(HEAD && sHEAD){
+          if((HEAD ->num_user_for_reviews) <= (sHEAD->num_user_for_reviews)){
+            if(count == 0){
+              ++count;
+              returnTop = HEAD;
+              returnHead = HEAD;
+            
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+           else{
+            returnTop->next = HEAD;
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop=returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+        }
+        else{
+          if(count == 0){
+            ++count;
+            returnTop = sHEAD;
+            returnHead = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop->next = NULL;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+          else{
+            returnTop ->next = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop = returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+        }
+      }
       case 19://char * language;
       case 20://char * country;
       case 21://char * content_rating;
       case 22://long budget;
+        while(HEAD && sHEAD){
+          if((HEAD ->budget) <= (sHEAD->budget)){
+            if(count == 0){
+              ++count;
+              returnTop = HEAD;
+              returnHead = HEAD;
+            
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+           else{
+            returnTop->next = HEAD;
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop=returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+        }
+        else{
+          if(count == 0){
+            ++count;
+            returnTop = sHEAD;
+            returnHead = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop->next = NULL;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+          else{
+            returnTop ->next = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop = returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+        }
+      }
       case 23://int title_year;
+        while(HEAD && sHEAD){
+          if((HEAD ->title_year) <= (sHEAD->title_year)){
+            if(count == 0){
+              ++count;
+              returnTop = HEAD;
+              returnHead = HEAD;
+            
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+           else{
+            returnTop->next = HEAD;
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop=returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+        }
+        else{
+          if(count == 0){
+            ++count;
+            returnTop = sHEAD;
+            returnHead = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop->next = NULL;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+          else{
+            returnTop ->next = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop = returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+        }
+      }
       case 24://int actor_2_facebook_likes;
+       while(HEAD && sHEAD){
+          if((HEAD ->actor_2_facebook_likes) <= (sHEAD->actor_2_facebook_likes)){
+            if(count == 0){
+              ++count;
+              returnTop = HEAD;
+              returnHead = HEAD;
+            
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+           else{
+            returnTop->next = HEAD;
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop=returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+        }
+        else{
+          if(count == 0){
+            ++count;
+            returnTop = sHEAD;
+            returnHead = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop->next = NULL;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+          else{
+            returnTop ->next = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop = returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+        }
+      }
       case 25://float imdb_score;
+        while(HEAD && sHEAD){
+          if((HEAD ->imdb_score) <= (sHEAD->imdb_score)){
+            if(count == 0){
+              ++count;
+              returnTop = HEAD;
+              returnHead = HEAD;
+            
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+           else{
+            returnTop->next = HEAD;
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop=returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+        }
+        else{
+          if(count == 0){
+            ++count;
+            returnTop = sHEAD;
+            returnHead = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop->next = NULL;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+          else{
+            returnTop ->next = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop = returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+        }
+      }
       case 26://float aspect_ratio;
-      case 27:; //int movie_facebook_likes;
+        while(HEAD && sHEAD){
+          if((HEAD ->aspect_ratio) <= (sHEAD->aspect_ratio)){
+            if(count == 0){
+              ++count;
+              returnTop = HEAD;
+              returnHead = HEAD;
+            
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+           else{
+            returnTop->next = HEAD;
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop=returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+        }
+        else{
+          if(count == 0){
+            ++count;
+            returnTop = sHEAD;
+            returnHead = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop->next = NULL;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+          else{
+            returnTop ->next = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop = returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+        }
+      }
+      case 27: //int movie_facebook_likes;
+        while(HEAD && sHEAD){
+          if((HEAD ->movie_facebook_likes) <= (sHEAD->movie_facebook_likes)){
+            if(count == 0){
+              ++count;
+              returnTop = HEAD;
+              returnHead = HEAD;
+            
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+           else{
+            returnTop->next = HEAD;
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop=returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+        }
+        else{
+          if(count == 0){
+            ++count;
+            returnTop = sHEAD;
+            returnHead = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop->next = NULL;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+          else{
+            returnTop ->next = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop = returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
+            }
+          }
+        }
+      }
     }
     return returnHead; 
 }
