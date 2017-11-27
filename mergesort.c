@@ -37,9 +37,96 @@ split(Record ** head, int count)
 
 }
 
+Record ** 
+merge(Record ** head, Record** secondHead, int sortBycol)
+{
+  if(!(*head)){
+          return secondHead;
+        }
+    if(!(*secondHead)){
+        return head;
+      }    
+    Record **returnHead;//begining of list
+    Record **returnTop//pointer to last non null node in list
+    int count = 0;
+    switch(sortBycol){
+      case 0://char* color;
+        /*while(head && secondHead){
+          if(strcmp(((*head)->color),((*secondHead)-> color))<=0){//head comes first.
+            if(count == 0){
+              returnTop = head;
+              returnHead = head;
+              (*head)
+              ++count;
+              continue;
+            }
+            returnHead = head;
+            (*returnHead)->next = NULL;
+
+        }*/
+      case 1://char* director_name;
+      case 2://int num_critic_for_reviews;
+      case 3://int duration;
+      case 4://int director_facebook_likes;
+      case 5://int actor_3_facebook_likes;
+      case 6://char * actor_2_name;
+      case 7:// int actor_1_facebook_likes;
+      case 8://int gross;
+        while(*head && *secondHead){
+          if(((*head)->gross) <= (((*secondHead)-> gross))){
+            if(count == 0){//first one
+              ++count;
+              returnTop = head;
+              returnHead = head;
+              *head = (*head)->next;
+              (*returnHead)->next = NULL;
+            }
+              (*returnTop)->next = *head;
+              (*returnTop) = (*returnTop)->next;
+              *head = (*head)->next;
+              (*returnTop)->next = NULL;
+              continue;
+          }
+          else{
+            if(count == 0){//first one
+              ++count;
+              returnTop = secondHead;
+              returnHead = secondHead;
+              *head = (*secondHead)->next;
+              (*returnHead)->next = NULL;
+              continue;
+            }
+              (*returnTop)->next = *secondHead;
+              (*returnTop) = (*returnTop)->next;
+              *secondHead = (*secondHead)->next;
+              (*returnTop)->next = NULL;
+              continue;
+          }
+        }
+      case 9://char * genres;
+      case 10://char * actor_1_name;
+      case 11://char * movie_title;
+      case 12://int num_voted_users;
+      case 13://int cast_total_facebook_likes;
+      case 14://char * actor_3_name;
+      case 15://int facenumber_in_poster;
+      case 16://char * plot_keywords;
+      case 17://char * movie_imdb_link;
+      case 18://int num_user_for_reviews;
+      case 19://char * language;
+      case 20://char * country;
+      case 21://char * content_rating;
+      case 22://long budget;
+      case 23://int title_year;
+      case 24://int actor_2_facebook_likes;
+      case 25://float imdb_score;
+      case 26://float aspect_ratio;
+    case 27://int movie_facebook_likes;
+    }  
+}
 
 
-
+/*
 Record **
 merge(Record ** head, Record ** secondHead, int sortBycol)
 {//merge the two lists. Based on sort By col. Sort by col is a zer indexed integer that gives me which column in the struct we are sorting by.
@@ -484,6 +571,7 @@ merge(Record ** head, Record ** secondHead, int sortBycol)
 			return head;
   }
 }
+*/
 
 void*
 t_mergesort(void* arg){//basically just calls mergesort from a void*
