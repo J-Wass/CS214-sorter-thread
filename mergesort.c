@@ -47,7 +47,7 @@ merge(Record ** head, Record** secondHead, int sortBycol)
         return head;
       }    
     Record **returnHead;//begining of list
-    Record **returnTop//pointer to last non null node in list
+    Record **returnTop;//pointer to last non null node in list
     int count = 0;
     switch(sortBycol){
       case 0://char* color;
@@ -72,19 +72,20 @@ merge(Record ** head, Record** secondHead, int sortBycol)
       case 6://char * actor_2_name;
       case 7:// int actor_1_facebook_likes;
       case 8://int gross;
-        while(*head && *secondHead){
+        while(*head != NULL && *secondHead != NULL){
           if(((*head)->gross) <= (((*secondHead)-> gross))){
+            //puts("here");
             if(count == 0){//first one
               ++count;
               returnTop = head;
               returnHead = head;
-              if((*head)->next){
-                *head = (*head)->next;
-                (*returnHead)->next = NULL;
-                continue;
+              if((*head)->next != NULL){
+                head = &(*head)->next;
+                (*returnTop)->next = NULL;
+                continue;//in while loop
               }
               else{
-                (*returnHead)->next = *secondHead;
+                (*returnTop)->next = *secondHead;
                 return returnHead;
               }
             }
@@ -92,28 +93,29 @@ merge(Record ** head, Record** secondHead, int sortBycol)
               (*returnTop)->next = *head;
               (*returnTop) = (*returnTop)->next;
                if((*head)->next){
-                  *head = (*head)->next;
-                  (*returnHead)->next = NULL;
+                  head = &(*head)->next;
+                  (*returnTop)->next = NULL;
                   continue;
               }
               else{
-                (*returnHead)->next = *secondHead;
+                (*returnTop)->next = *secondHead;
                 return returnHead;
               }
             }
           }
           else{
+           //puts("here2");
             if(count == 0){//first one
               ++count;
               returnTop = secondHead;
               returnHead = secondHead;
               if((*secondHead)->next){
-                *secondHead = (*secondHead)->next;
-                (*returnHead)->next = NULL;
+                secondHead = &(*secondHead)->next;
+                (*returnTop)->next = NULL;
                 continue;
               }
               else{
-                (*returnHead)->next= *head;
+                (*returnTop)->next= *head;
                 return returnHead;
               }
             }
@@ -121,12 +123,12 @@ merge(Record ** head, Record** secondHead, int sortBycol)
               (*returnTop)->next = *secondHead;
               (*returnTop) = (*returnTop)->next;
                if((*secondHead)->next){
-                *secondHead = (*secondHead)->next;
-                (*returnHead)->next = NULL;
+                secondHead = &(*secondHead)->next;
+                (*returnTop)->next = NULL;
                 continue;
               }
               else{
-                (*returnHead)->next= *head;
+                (*returnTop)->next= *head;
                 return returnHead;
               }
           }
@@ -150,11 +152,9 @@ merge(Record ** head, Record** secondHead, int sortBycol)
       case 24://int actor_2_facebook_likes;
       case 25://float imdb_score;
       case 26://float aspect_ratio;
-      case 27://int movie_facebook_likes;
-    } 
-    if(*head){//secondhead is empty
-
-    } 
+      case 27:; //int movie_facebook_likes;
+    }
+    return returnHead; 
 }
 
 
