@@ -37,17 +37,19 @@ split(Record ** head, int count)
 
 }
 
-Record ** 
+Record * 
 merge(Record ** head, Record** secondHead, int sortBycol)
 {
   if(!(*head)){
-          return secondHead;
+          return *secondHead;
         }
     if(!(*secondHead)){
-        return head;
+        return *head;
       }    
-    Record **returnHead;//begining of list
-    Record **returnTop;//pointer to last non null node in list
+    Record *returnHead;//begining of list
+    Record *returnTop;//pointer to last non null node in list
+    Record *HEAD = *head;
+    Record *sHEAD = *secondHead;
     int count = 0;
     switch(sortBycol){
       case 0://char* color;
@@ -72,65 +74,63 @@ merge(Record ** head, Record** secondHead, int sortBycol)
       case 6://char * actor_2_name;
       case 7:// int actor_1_facebook_likes;
       case 8://int gross;
-        while(*head != NULL && *secondHead != NULL){
-          if(((*head)->gross) <= (((*secondHead)-> gross))){
-            //puts("here");
-            if(count == 0){//first one
+        while(HEAD && sHEAD){
+          if((HEAD -> gross) <= (sHEAD->gross)){
+            if(count == 0){
               ++count;
-              returnTop = head;
-              returnHead = head;
-              if((*head)->next != NULL){
-                head = &(*head)->next;
-                (*returnTop)->next = NULL;
-                continue;//in while loop
-              }
-              else{
-                (*returnTop)->next = *secondHead;
-                return returnHead;
-              }
+              returnTop = HEAD;
+              returnHead = HEAD;
+            
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop->next = NULL;
+              continue;
             }
             else{
-              (*returnTop)->next = *head;
-              (*returnTop) = (*returnTop)->next;
-               if((*head)->next){
-                  head = &(*head)->next;
-                  (*returnTop)->next = NULL;
-                  continue;
-              }
-              else{
-                (*returnTop)->next = *secondHead;
-                return returnHead;
-              }
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+           else{
+            returnTop->next = HEAD;
+            if(HEAD->next){
+              HEAD = HEAD->next;
+              returnTop=returnTop->next;
+              returnTop ->next = NULL;
+              continue;
+            }
+            else{
+            returnTop->next = sHEAD;
+            return returnHead;
+            }
+          }
+        }
+        else{
+          if(count == 0){
+            ++count;
+            returnTop = sHEAD;
+            returnHead = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop->next = NULL;
+            }
+            else{
+              returnTop->next = HEAD;
+              return returnHead;
             }
           }
           else{
-           //puts("here2");
-            if(count == 0){//first one
-              ++count;
-              returnTop = secondHead;
-              returnHead = secondHead;
-              if((*secondHead)->next){
-                secondHead = &(*secondHead)->next;
-                (*returnTop)->next = NULL;
-                continue;
-              }
-              else{
-                (*returnTop)->next= *head;
-                return returnHead;
-              }
+            returnTop ->next = sHEAD;
+            if(sHEAD->next){
+              sHEAD = sHEAD->next;
+              returnTop = returnTop->next;
+              returnTop ->next = NULL;
+              continue;
             }
             else{
-              (*returnTop)->next = *secondHead;
-              (*returnTop) = (*returnTop)->next;
-               if((*secondHead)->next){
-                secondHead = &(*secondHead)->next;
-                (*returnTop)->next = NULL;
-                continue;
-              }
-              else{
-                (*returnTop)->next= *head;
-                return returnHead;
-              }
+              returnTop->next = HEAD;
+              return returnHead;
+            }
           }
         }
       }
@@ -626,7 +626,8 @@ mergesort(Record** head)
     fhead = *mergesort(head);
     *head = fhead;
     *secondHalf  = secondHead;
-    return merge(head,secondHalf,sortByCol);
+    *head = merge(head,secondHalf,sortByCol);
+    return head;
   }
   if((*head) -> next == NULL){//only 1 element
     return head;
