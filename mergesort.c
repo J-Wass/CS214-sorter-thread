@@ -78,31 +78,60 @@ merge(Record ** head, Record** secondHead, int sortBycol)
               ++count;
               returnTop = head;
               returnHead = head;
-              *head = (*head)->next;
-              (*returnHead)->next = NULL;
+              if((*head)->next){
+                *head = (*head)->next;
+                (*returnHead)->next = NULL;
+                continue;
+              }
+              else{
+                (*returnHead)->next = *secondHead;
+                return returnHead;
+              }
             }
+            else{
               (*returnTop)->next = *head;
               (*returnTop) = (*returnTop)->next;
-              *head = (*head)->next;
-              (*returnTop)->next = NULL;
-              continue;
+               if((*head)->next){
+                  *head = (*head)->next;
+                  (*returnHead)->next = NULL;
+                  continue;
+              }
+              else{
+                (*returnHead)->next = *secondHead;
+                return returnHead;
+              }
+            }
           }
           else{
             if(count == 0){//first one
               ++count;
               returnTop = secondHead;
               returnHead = secondHead;
-              *head = (*secondHead)->next;
-              (*returnHead)->next = NULL;
-              continue;
+              if((*secondHead)->next){
+                *secondHead = (*secondHead)->next;
+                (*returnHead)->next = NULL;
+                continue;
+              }
+              else{
+                (*returnHead)->next= *head;
+                return returnHead;
+              }
             }
+            else{
               (*returnTop)->next = *secondHead;
               (*returnTop) = (*returnTop)->next;
-              *secondHead = (*secondHead)->next;
-              (*returnTop)->next = NULL;
-              continue;
+               if((*secondHead)->next){
+                *secondHead = (*secondHead)->next;
+                (*returnHead)->next = NULL;
+                continue;
+              }
+              else{
+                (*returnHead)->next= *head;
+                return returnHead;
+              }
           }
         }
+      }
       case 9://char * genres;
       case 10://char * actor_1_name;
       case 11://char * movie_title;
@@ -121,8 +150,11 @@ merge(Record ** head, Record** secondHead, int sortBycol)
       case 24://int actor_2_facebook_likes;
       case 25://float imdb_score;
       case 26://float aspect_ratio;
-    case 27://int movie_facebook_likes;
-    }  
+      case 27://int movie_facebook_likes;
+    } 
+    if(*head){//secondhead is empty
+
+    } 
 }
 
 
