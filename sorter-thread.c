@@ -19,17 +19,79 @@ int main(int argc, char ** argv){
   sortingInt = (int *)malloc(sizeof(int));
   threadCount = (int *)malloc(sizeof(int));
   if(argc < 2){
-    fprintf(stderr, "Too few arguments. Usage is ./sorter -c [sortcol] -d [in directory] -o [out directory]");
-    return 0;
-  }
-  if(strcmp(argv[1],"-c") != 0){
-    fprintf(stderr, "Expecting -c flag. Usage is './sorter -c [sortcol] -d [in directory] -o [out directory]'");
+    fprintf(stderr, "Too few arguments. Usage is ./sorter -c [sortcol] -d [in directory] -o [out directory]\n");
     return 0;
   }
 
-  //parse sortbycol to an int for sorting
-  char * sortByCol = argv[2];
-  int sortInt = 0;
+  int sortInt;
+  char inDir[256];
+  char outDir[256];
+  char sortByCol[256];
+  sortByCol[0] = '\0';
+
+  //populate inDir and outDir with defaults
+  if (getcwd(inDir, sizeof(inDir)) == NULL)
+  {
+    fprintf(stderr, "Could not read current working directory.\n");
+    return 0;
+  }
+  strcpy(outDir, inDir);
+
+  char * flag1 = argv[1];
+  if(strcmp(flag1,"-c") == 0){
+    strcpy(sortByCol, argv[2]);
+  }
+  else if(strcmp(flag1,"-d") == 0){
+    strcpy(inDir, argv[2]);
+  }
+  else if(strcmp(flag1,"-o") == 0){
+    strcpy(outDir, argv[2]);
+  }
+  else{
+    fprintf(stderr, "Incorrect use. Usage is ./sorter -c [sortcol] -d [in directory] -o [out directory]\n");
+    return 0;
+  }
+
+  if(argc >= 4){
+    char * flag2 = argv[3];
+    if(strcmp(flag2,"-c") == 0){
+      strcpy(sortByCol, argv[4]);
+    }
+    else if(strcmp(flag2,"-d") == 0){
+      strcpy(inDir, argv[4]);
+    }
+    else if(strcmp(flag2,"-o") == 0){
+      strcpy(outDir, argv[4]);
+    }
+    else{
+      fprintf(stderr, "Incorrect use. Usage is ./sorter -c [sortcol] -d [in directory] -o [out directory]\n");
+      return 0;
+    }
+  }
+
+  if(argc == 7){
+    char * flag3 = argv[5];
+    if(strcmp(flag3,"-c") == 0){
+      strcpy(sortByCol, argv[6]);
+    }
+    else if(strcmp(flag3,"-d") == 0){
+      strcpy(inDir, argv[6]);
+    }
+    else if(strcmp(flag3,"-o") == 0){
+      strcpy(outDir, argv[6]);
+    }
+    else{
+      fprintf(stderr, "Incorrect use. Usage is ./sorter -c [sortcol] -d [in directory] -o [out directory]\n");
+      return 0;
+    }
+  }
+
+  if(sortByCol[0] == '\0'){
+    fprintf(stderr, "The -c flag is required! Usage is ./sorter -c [sortcol] -d [in directory] -o [out directory]\n");
+    return 0;
+  }
+
+  //parse sort by column into an int
   if(strcmp(sortByCol,  "color")==0) sortInt=0;
   else if(strcmp(sortByCol, "director_name")==0) sortInt=1;
   else if(strcmp(sortByCol, "num_critic_for_reviews")==0) sortInt=2;
@@ -62,42 +124,7 @@ int main(int argc, char ** argv){
     fprintf(stderr, "Please use a valid column name!\n");
     return 0;
   }
-  //load input and output directory to current working directory
-  char inDir[1024];
-  char outDir[1024];
-  if (getcwd(inDir, sizeof(inDir)) == NULL)
-  {
-    fprintf(stderr, "Could not read current working directory.");
-    return 0;
-  }
-  strcpy(outDir, inDir);
-  //has -o or -d flags
-  if(argc >= 4){
-    // ./sorter -c [col] -d [dir]
-    if(strcmp(argv[3],"-d") == 0){
-      strcpy(inDir, argv[4]);
-      strcpy(outDir, inDir);
-      // ./sorter -c [col] -d [dir] -o [dir]
-      if(argc == 7){
-        if(strcmp(argv[5],"-o") == 0){
-          strcpy(outDir, argv[6]);
-        }
-        else{
-          fprintf(stderr, "Expecting -o flag. Usage is './sorter -c [sortcol] -d [in directory] -o [out directory]'");
-          return 0;
-        }
-      }
-    }
-    // ./sorter -c [col] -o [dir]
-    else if(strcmp(argv[3],"-o") == 0)
-    {
-      strcpy(outDir, argv[4]);
-    }
-    else{
-      fprintf(stderr, "Expecting -d or -o flag. Usage is './sorter -c [sortcol] -d [in directory] -o [out directory]'");
-      return 0;
-    }
-  }
+
   DIR * inputDir = opendir (inDir);
   DIR * outputDir = opendir (outDir);
   if (inputDir == NULL) {
@@ -114,14 +141,14 @@ int main(int argc, char ** argv){
   printf("TIDs of all child thread: ");
   fflush(stdout);
   *threadCount = -1;
-  pthread_t * threads = (pthread_t *)malloc(sizeof(pthread_t) * 256);
+  pthread_t * threads = (pthread_t *)malloc(sizeof(pthread_t) * 2048);
   sortCSVs(inputDir, inDir, outputDir, outDir, sortByCol, 1, sortInt, threads);
   printf("\nTotal number of threads: %d\n", *threadCount + 1);
   closedir(inputDir);
   closedir(outputDir);
   free(threads);
   free(threadCount);
-  free(sortingInt);
+  free(sortingInt); //sorting int is found in mergesort.c
   return 0;
 }
 
@@ -149,7 +176,6 @@ void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir, char
       pthread_create (&thr, NULL, FileSortHandler, (void *)path);
       ++(*threadCount);
       threads[*threadCount] = thr;
-      //break;//REMOVE AFTER TESTING
     }
     //DIRECTORY
     if(inFile->d_type == 4){
@@ -164,7 +190,6 @@ void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir, char
   }
   //only run if called from main()
   if(mainCall == 1){
-    printf("maincall\n");
     int counter = *threadCount;
     Record * linkedlist = NULL;
     while(counter >= 0){
@@ -186,14 +211,9 @@ void sortCSVs(DIR * inputDir, char * inDir, DIR * outputDir, char * outDir, char
     *sortingInt = sortInt;
     Record * sortedHead;
     Record ** sorted_head;
-    //pthread_t sorterThread;
-    printf("before\n");
-    //pthread_create (&sorterThread, NULL, mergesort, (void *)&linkedlist);
-		//pthread_join(sorterThread, (void *)&sortedHead);
     sorted_head = mergesort(&linkedlist);
     sortedHead= *sorted_head;
-    printf("after\n");
-    //print out sorted file
+
     char newFile[21 + strlen(outDir) + strlen(sortName)];
     strcpy(newFile, outDir);
     strcat(newFile, "/AllFiles-sorted-");
