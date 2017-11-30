@@ -137,8 +137,8 @@ int main(int argc, char ** argv){
        outDir);
       return 0;
   }
-  printf("Initial TID: %ld\n", (unsigned long int)pthread_self());
-  printf("TIDs of all child thread: ");
+  printf("Initial PID: %d\n", getpid());
+  printf("TIDs of all child threads: ");
   fflush(stdout);
   *threadCount = -1;
   pthread_t * threads = (pthread_t *)malloc(sizeof(pthread_t) * 2048);
